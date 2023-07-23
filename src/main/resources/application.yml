@@ -1,0 +1,65 @@
+spring:
+  application:
+    name: api-gateway
+  ##GATEWAY CONFIGURATIONS
+  cloud:
+    gateway:
+      routes:
+        ## USER SERVICE
+        - id: api-users
+          uri: lb://API-USERS
+          predicates:
+          - Path=/v1/api/users/**
+          filters:
+            - JwtAuthenticationFilter
+#            - name: CircuitBreaker
+#              args:
+#                name: api-users
+#                fallbackuri: forward:/apiUserFallBack
+        ## STORE SERVICE
+        - id: api-store
+          uri: lb://API-STORE
+          predicates:
+            - Path=/v1/api/store/**
+          filters:
+            - JwtAuthenticationFilter
+        ## ORDER SERVICE
+        - id: order
+          uri: lb://order
+          predicates:
+            - Path=/v1/api/orders/**
+          filters:
+            - JwtAuthenticationFilter
+        ## ZILCH-PAY SERVICE
+        - id: zilch-pay
+          uri: lb://ZILCH-PAY
+          predicates:
+            - Path=/v1/api/zilch/**
+          filters:
+            - JwtAuthenticationFilter
+server:
+  port: 8082
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: hystrix.stream
+
+hystrix:
+  command:
+    fallbackcmd:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 5000
+
+security:
+  jwt:
+    secret: JWTSuperSecretKey654321
+    expirationInMs: 604800000
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8081/eureka
