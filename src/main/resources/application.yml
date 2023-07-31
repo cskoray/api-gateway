@@ -9,13 +9,13 @@ spring:
         - id: api-users
           uri: lb://API-USERS
           predicates:
-          - Path=/v1/api/users/**
+            - Path=/v1/api/users/**
           filters:
             - JwtAuthenticationFilter
-#            - name: CircuitBreaker
-#              args:
-#                name: api-users
-#                fallbackuri: forward:/apiUserFallBack
+        #            - name: CircuitBreaker
+        #              args:
+        #                name: api-users
+        #                fallbackuri: forward:/apiUserFallBack
         ## STORE SERVICE
         - id: api-store
           uri: lb://API-STORE
@@ -43,8 +43,14 @@ server:
 management:
   endpoints:
     web:
+      base-path: "/"
       exposure:
-        include: hystrix.stream
+        include: [ "health", "info" ]
+  endpoint:
+    info:
+      enabled: true
+    health:
+      enabled: true
 
 hystrix:
   command:
